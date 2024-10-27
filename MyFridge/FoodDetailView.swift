@@ -6,98 +6,98 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct FoodDetailView: View {
-    var food : Food
-    @State private var pfood : Food = foodList[0]
+    @Environment(\.modelContext) var modelContext
+    @Bindable var food : Food
+    @Query var userSettings: [UserSettings]
+//    @State private var pfood : Food = foodList[0]
     @State private var isEditing = false
-    @State private var newQuantity: Int?
-    @State private var newExpirationDate: Date
+//    @State private var newQuantity: Int?
+//    @State private var newExpirationDate: Date
     
-    init(food: Food, pfood: Food = foodList[0], isEditing: Bool = false, newQuantity: Int? = nil, newExpirationDate: Date = Date()) {
-        self.food = food
-        self.pfood = food
-        self.isEditing = isEditing
-        self.newQuantity = newQuantity
-        self.newExpirationDate = newExpirationDate
-    }
+//    init(food: Food, pfood: Food = foodList[0], isEditing: Bool = false, newQuantity: Int? = nil, newExpirationDate: Date = Date()) {
+//        self.food = food
+//        self.pfood = food
+//        self.isEditing = isEditing
+//        self.newQuantity = newQuantity
+//        self.newExpirationDate = newExpirationDate
+//    }
 
     var body: some View {
+        let setting : UserSettings = userSettings.first!
         VStack(alignment:.leading) {
 //            Text(pfood.name)
 //               .font(.title)
 
-            if let imageName = pfood.imageName {
-                Image(imageName)
-                   .resizable()
-                   .frame(width: 150, height: 150)
+            if let imageData = food.image, let uiImage = UIImage(data: imageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .frame(width: 300, height: 300)
             } else {
                 Image(systemName: "photo.badge.plus")
-                   .resizable()
-                   .frame(width: 150, height: 150)
+                    .resizable()
+                    .frame(width: 300, height: 300)
             }
             
-            Text("Expiration Date: \(pfood.expirationDate)")
-            if pfood.isNearExpiration {
-                Text("This food is near expiration.")
-                   .foregroundColor(.red)
-            } else {
-                Text("Days left until expiration: \(pfood.expirationDaysLeft)")
-            }
-
-            if settings.showEnergy {
-                Text("Energy: \(pfood.nutrition.energy) kcal")
-            }
-            if settings.showWater {
-                Text("Water: \(pfood.nutrition.water) g")
-            }
-            if settings.showCarbohydrate {
-                Text("Carbohydrate: \(pfood.nutrition.carbohydrate) g")
-            }
-            if settings.showSugars {
-                Text("Sugars: \(pfood.nutrition.sugars) g")
-            }
-            if settings.showProtein {
-                Text("Protein: \(pfood.nutrition.protein) g")
-            }
-            if settings.showFat {
-                Text("Fat: \(pfood.nutrition.fat) g")
-            }
-
-            if !pfood.recipes.isEmpty {
-                Text("Recipes:")
-                ForEach(pfood.recipes) { recipe in
-                    Text(recipe.name)
-                }
-            }
-
             if isEditing {
-                HStack {
-                    TextField("Quantity", value: $newQuantity, format:.number)
-                       .keyboardType(.numberPad)
-                    DatePicker("Expiration Date", selection: $newExpirationDate, displayedComponents:.date)
+                VStack(alignment:.leading) {
+                    HStack{
+                        Text("Quantity: ")
+                        TextField("Quantity: ", value: $food.quantity, format:.number)
+                           .keyboardType(.numberPad)
+                        Text(" \(food.unit)")
+                    }
+                    
+                    DatePicker("Expiration Date: ", selection: $food.expirationDate, displayedComponents:.date)
                 }
             } else {
-                HStack {
-                    Text("Quantity: \(pfood.quantity) pieces")
-                    Text("Expiration Date: \(pfood.expirationDate)")
+                VStack(alignment:.leading) {
+                    Text("Quantity: \(food.quantity) \(food.unit)")
+                    Text("Expiration Date: \(food.expirationDate.formatted(date: .abbreviated, time: .omitted)), \(food.expirationDaysLeft) days left")
+                        .foregroundColor(food.expirationDaysLeft <= userSettings.first!.daysUntilNearExpiration ? .red : .primary)
+
                 }
             }
+            
+            if setting.showEnergy {
+                Text("Energy: \(String(format: "%.1f", food.nutrition.energy)) kcal")
+            }
+            if setting.showWater {
+                Text("Water: \(String(format: "%.1f", food.nutrition.water)) g")
+            }
+            if setting.showCarbohydrate {
+                Text("Carbohydrate: \(String(format: "%.1f", food.nutrition.carbohydrate)) g")
+            }
+            if setting.showSugars {
+                Text("Sugars: \(String(format: "%.1f", food.nutrition.sugars)) g")
+            }
+            if setting.showProtein {
+                Text("Protein: \(String(format: "%.1f", food.nutrition.protein)) g")
+            }
+            if setting.showFat {
+                Text("Fat: \(String(format: "%.1f", food.nutrition.fat)) g")
+            }
+            
+        // TODO: why hidden shows error: Argument passed to call that takes no arguments
+//            Text("Energy: \(food.nutrition.energy) kcal")
+//                .hidden(!setting.showEnergy)
+
+//            if !food.recipes.isEmpty {
+//                Text("Recipes:")
+//                ForEach(food.recipes) { recipe in
+//                    Text(recipe.name)
+//                }
+//            }
+
 
             Button(action: {
                 if isEditing {
-                    if let quantity = newQuantity {
-                        pfood.quantity = quantity
-                        pfood.expirationDate = newExpirationDate
-                        if let index = foodList.firstIndex(where: { $0.id == pfood.id }) {
-                            foodList[index] = pfood
-                        }
-                    }
+                    try? modelContext.save()
                     isEditing = false
                 } else {
                     isEditing = true
-                    newQuantity = pfood.quantity
-                    newExpirationDate = pfood.expirationDate
                 }
             }) {
                 if isEditing {

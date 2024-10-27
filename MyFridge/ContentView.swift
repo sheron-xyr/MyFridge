@@ -6,112 +6,81 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+    @State private var foodSortOrder = SortDescriptor(\Food.expirationDate)
+    @State private var foodSearchText = ""
+    @State private var recipeSearchText = ""
+    @State private var showOnlyFavorites = false
+    @Environment(\.modelContext) var modelContext
+    @Query var userSettings: [UserSettings]
+    
+    
     var body: some View {
         TabView {
             HomeView()
                 .tabItem {
                     Label("Home", systemImage: "house")
                 }
-
-
-            FoodListView()
+            
+            
+            FoodListView(sort: foodSortOrder, searchText: foodSearchText)
                 .tabItem {
+                    //TODO: this label is invisible but clickable
                     Label("Food List", systemImage: "list.bullet")
                 }
+            // search bar
+                .searchable(text: $foodSearchText)
+                .toolbar {
+                    // TODO: this picker is missing
+                    ToolbarItem(placement:.navigationBarTrailing) {
+                        Picker("Sort", selection: $foodSortOrder) {
+                            Text("Expiration Date (Near to Far)")
+                                .tag(SortDescriptor(\Food.expirationDate))
+                            
+                            Text("Food Name (Alphabetical)")
+                                .tag(SortDescriptor(\Food.name))
+                        }
+                        .pickerStyle(.inline)
+                    }
+                }
             
-            RecipeListView()
+            RecipeListView(searchString: recipeSearchText, showFavoriteOnly: showOnlyFavorites)
                 .tabItem {
+                    //TODO: this label is invisible but clickable
                     Label("Recipe List", systemImage: "book")
                 }
-            
-            SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
+                .searchable(text: $recipeSearchText)
+                .toolbar {
+                    // TODO: this toggle is missing
+                    ToolbarItem(placement:.navigationBarTrailing) {
+                        Toggle(isOn: $showOnlyFavorites) {
+                            Text("Only Favorites")
+                        }
+                    }
                 }
+            
+            
+            if let firstUserSetting = userSettings.first {
+                SettingsView(userSetting: firstUserSetting)
+                    .tabItem {
+                        Label("Settings", systemImage: "gear")
+                    }
+            } else {
+                Text("Loading settings...")
+                    .tabItem {
+                        Label("Settings", systemImage: "gear")
+                    }
+            }
         }
-        
+        .onAppear {
+            // TODO: cannot ensure it happens before the setting data is needed
+            if userSettings.isEmpty {
+                let defaultSettings = UserSettings()
+                modelContext.insert(defaultSettings)
+                try? modelContext.save()
+            }
+        }
     }
 }
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
-
-//struct ContentView: View {
-////    @State private var selectedTab: Tab = .home
-//    var body: some View {
-//        TabView(selection: $selectedTab) {
-//            HomePage(selectedTab: $selectedTab)
-//              .tabItem {
-//                    Label("Home", systemImage: "house")
-//                }
-//              .tag(Tab.home)
-//            FoodListPage(selectedTab: $selectedTab)
-//              .tabItem {
-//                    Label("Food List", systemImage: "list.bullet")
-//                }
-//              .tag(Tab.foodList)
-//            RecipeListPage(selectedTab: $selectedTab)
-//              .tabItem {
-//                    Label("Recipe List", systemImage: "book")
-//                }
-//              .tag(Tab.recipeList)
-//        }
-//    }
-//}
-//
-//enum Tab {
-//    case home
-//    case foodList
-//    case recipeList
-//    case addFood
-//    case settings
-//}
-//
-//struct HomePage: View {
-//    @Binding var selectedTab: Tab
-//    var body: some View {
-//        VStack {
-//            Image(systemName: "leaf")
-//              .resizable()
-//              .aspectRatio(contentMode:.fit)
-//              .frame(width: 100, height: 100)
-//            HStack {
-//                Button(action: {
-//                    selectedTab = .foodList
-//                }) {
-//                    Text("Food List")
-//                }
-//                Button(action: {
-//                    selectedTab = .recipeList
-//                }) {
-//                    Text("Recipe List")
-//                }
-//            }
-//            Spacer()
-//            NavigationLink(destination: SettingsPage()) {
-//                Image(systemName: "gear")
-//            }
-//        }
-//    }
-//}
-//
-
-//
-//struct PreviewProvider_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TabView(selection: Binding.constant(Tab.home)) {
-//            HomePage(selectedTab: Binding.constant(Tab.home))
-//            FoodListPage(selectedTab: Binding.constant(Tab.foodList))
-//            RecipeListPage(selectedTab: Binding.constant(Tab.recipeList))
-//            SettingsPage()
-////            FoodDetailPage(selectedTab: Binding.constant(Tab.foodList), food: foodData[0])
-//            AddFoodPage(selectedTab: Binding.constant(Tab.addFood))
-////            RecipeDetailPage(selectedTab: Binding.constant(Tab.recipeList), recipe: recipeData[0])
-//        }
-//    }
-//}

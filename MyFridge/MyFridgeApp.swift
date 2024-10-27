@@ -13,5 +13,8 @@ struct MyFridgeApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: [UserSettings.self, Nutrition.self, Food.self, Recipe.self])
+//        .modelContainer(for: [UserSettings.self, Ingredient.self, Nutrition.self, Food.self, Recipe.self])
+        
     }
 }

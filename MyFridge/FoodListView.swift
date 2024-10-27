@@ -6,77 +6,79 @@
 //
 
 import SwiftUI
+import SwiftData
 
 
 struct FoodListView: View {
-    @State private var searchText = ""
-    @State private var sortOption = SortOption.expirationDate
-    @State private var foodData : [Food] = foodList
+    @Environment(\.modelContext) var modelContext
+//    @State private var searchText = ""
+//    @State private var sortOrder = SortDescriptor(\Food.expirationDate)
+    @Query(sort: [SortDescriptor(\Food.expirationDate), SortDescriptor(\Food.name)]) var foodList: [Food]
+    @Query var userSettings: [UserSettings]
     
-    enum SortOption {
-        case expirationDate
-        case foodName
+    init(sort: SortDescriptor<Food>, searchText: String) {
+            _foodList = Query(filter: #Predicate {
+                if searchText.isEmpty {
+                    return true
+                } else {
+                    return $0.name.localizedStandardContains(searchText)
+                }
+            }, sort: [sort])
         }
+
     
-    var sortedFoods: [Food] {
-        var foods = foodData
-        switch sortOption {
-        case.expirationDate:
-            foods.sort { $0.expirationDaysLeft < $1.expirationDaysLeft }
-        case.foodName:
-            foods.sort { $0.name < $1.name }
-        }
-        return foods
-    }
-    
-    var filteredFoods: [Food] {
-        return sortedFoods.filter { food in
-            searchText.isEmpty || food.name.localizedCaseInsensitiveContains(searchText)
-        }
-    }
     
     var body: some View {
         NavigationStack {
             VStack {
                 // Search Bar
-                TextField("Search", text: $searchText)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
+//                TextField("Search", text: $searchText)
+//                    .padding()
+//                    .background(Color(.systemGray6))
+//                    .cornerRadius(8)
                 // Sorting Method
-                Picker("Sort by", selection: $sortOption) {
-                    Text("Expiration Date (Near to Far)").tag(SortOption.expirationDate)
-                    Text("Food Name (Alphabetical)").tag(SortOption.foodName)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .padding()
+//                Picker("Sort by", selection: $sortOption) {
+//                    Text("Expiration Date (Near to Far)").tag(SortOption.expirationDate)
+//                    Text("Food Name (Alphabetical)").tag(SortOption.foodName)
+//                }
+//                .pickerStyle(SegmentedPickerStyle())
+//                .padding()
+//                Menu("Sort", systemImage: "arrow.up.arrow.down") {
+//                    Picker("Sort", selection: $sortOrder) {
+//                        Text("Expiration Date (Near to Far)")
+//                            .tag(SortDescriptor(\Food.expirationDate))
+//                        Text("Food Name (Alphabetical)")
+//                            .tag(SortDescriptor(\Food.name))
+//                    }
+//                    .pickerStyle(.inline)
+//                }
 
-                List(filteredFoods) { food in
-                    HStack {
-                        if let imageName = food.imageName {
-                            Image(imageName)
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                        } else {
-                            Image(systemName: "photo.badge.plus")
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                        }
-//                        VStack(alignment:.leading) {
-                            Text(food.name)
-                            if food.isNearExpiration {
-                                Text("\(food.expirationDaysLeft) days left")
-                                    .foregroundColor(.red)
+                List{
+                    ForEach(foodList) { food in
+                        HStack {
+                            if let imageData = food.image, let uiImage = UIImage(data: imageData) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
                             } else {
-                                Text("\(food.expirationDaysLeft) days left")
+                                Image(systemName: "photo.badge.plus")
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
                             }
-//                        }
-//                        Spacer()
-                        Text("quantity: \(food.quantity) pieces")
-                        NavigationLink(value: food) {
-//                            Image(systemName: "chevron.right")
+                            
+                            Text(food.name)
+                            Spacer()
+                            Text("\(food.expirationDaysLeft) days left")
+                                .foregroundColor(food.expirationDaysLeft <= userSettings.first!.daysUntilNearExpiration ? .red : .primary)
+                            Spacer()
+                            Text("Quantity: \(food.quantity) \(food.unit)")
+                                .font(.subheadline)
+                            
+                            NavigationLink(value: food) {
+                            }
                         }
                     }
+                    .onDelete(perform: deleteFoods)
                 }
 
                 NavigationLink(destination: AddFoodView()) {
@@ -93,12 +95,14 @@ struct FoodListView: View {
                 FoodDetailView(food: food)
             }
         }
+        
     }
-}
-
-
-struct FoodListView_Previews: PreviewProvider {
-    static var previews: some View {
-        FoodListView()
+        
+    func deleteFoods(_ indexSet: IndexSet) {
+        for index in indexSet {
+            let food = foodList[index]
+            modelContext.delete(food)
+        }
     }
+
 }

@@ -6,117 +6,116 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct RecipeListView: View {
-    @State private var searchText = ""
-    @State private var showOnlyFavorites = false
-    @State private var recipeData : [Recipe] = recipeList
+    @Environment(\.modelContext) var modelContext
+//    @State private var searchText = ""
+//    @State private var showOnlyFavorites = false
+    @Query(sort: [SortDescriptor(\Recipe.name)]) var recipeList: [Recipe]
+    @Query var userSettings: [UserSettings]
 
-    var filteredRecipes: [Recipe] {
-        var allRecipes = recipeData
-        if showOnlyFavorites {
-            allRecipes = allRecipes.filter { $0.isFavorite }
+    init(searchString: String, showFavoriteOnly: Bool) {
+            _recipeList = Query(filter: #Predicate {
+                if showFavoriteOnly {
+                    return $0.isFavorite && (searchString.isEmpty || $0.name.localizedStandardContains(searchString))
+                    
+                } else {
+                    return searchString.isEmpty || $0.name.localizedStandardContains(searchString)
+                }
+            })
         }
-        return allRecipes.filter { recipe in
-            searchText.isEmpty || recipe.name.localizedCaseInsensitiveContains(searchText)
-        }
-    }
 
     var body: some View {
         NavigationStack {
             VStack {
-                TextField("Search", text: $searchText)
-                   .padding()
-                   .background(Color(.systemGray6))
-                   .cornerRadius(8)
+//                TextField("Search", text: $searchText)
+//                   .padding()
+//                   .background(Color(.systemGray6))
+//                   .cornerRadius(8)
 
-                Toggle(isOn: $showOnlyFavorites) {
-                    Text("Only Favorites")
-                }
-               .padding()
+//                Toggle(isOn: $showOnlyFavorites) {
+//                    Text("Only Favorites")
+//                }
+//               .padding()
 
-                List(filteredRecipes) { recipe in
-                    HStack {
-                        if let imageName = recipe.imageName{
-                            Image(imageName)
-                               .resizable()
-                               .frame(width: 50, height: 50)
-                        } else {
-                            Image(systemName: "photo.badge.plus")
-                               .resizable()
-                               .frame(width: 50, height: 50)
-                        }
-                        Text(recipe.name)
-                        Spacer()
-                        NavigationLink(destination: RecipeDetailView(recipe: Binding(get: { recipe }, set: { newValue in
-                                                    if let index = recipeList.firstIndex(where: { $0.id == recipe.id }) {
-                                                        recipeList[index] = newValue
-                                                    }
-                                                }))) {
+                List {
+                    ForEach(recipeList) { recipe in
+                        HStack {
+                            if let imageData = recipe.image, let uiImage = UIImage(data: imageData) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                            } else {
+                                Image(systemName: "photo.badge.plus")
+                                    .resizable()
+                                    .frame(width: 50, height: 50)
+                            }
+                            Text(recipe.name)
+                            Spacer()
+                            NavigationLink(value: recipe){
+                            }
                         }
                     }
+                    .onDelete(perform: deleteRecipes)
                 }
             }
            .navigationTitle("Recipe List")
+           .navigationDestination(for: Recipe.self) { recipe in
+               RecipeDetailView(recipe: recipe)
+           }
+        }
+    }
+    func deleteRecipes(_ indexSet: IndexSet) {
+        for index in indexSet {
+            let recipe = recipeList[index]
+            modelContext.delete(recipe)
         }
     }
 }
 
 struct RecipeDetailView: View {
-    @Binding var recipe : Recipe
+    @Environment(\.modelContext) var modelContext
+    @Bindable var recipe : Recipe
+    @Query var userSettings: [UserSettings]
 
     var body: some View {
+        let setting : UserSettings = userSettings.first!
         VStack(alignment:.leading) {
 //            Text(recipe.name)
 //               .font(.title)
-            if let imageName = recipe.imageName {
-                Image(imageName)
-                   .resizable()
-                   .frame(width: 150, height: 150)
+            if let imageData = recipe.image, let uiImage = UIImage(data: imageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .frame(width: 300, height: 300)
             } else {
                 Image(systemName: "photo.badge.plus")
                    .resizable()
-                   .frame(width: 150, height: 150)
+                   .frame(width: 300, height: 300)
             }
-            Text("Ingredients:")
-            ForEach(Array(zip(recipe.ingredients.indices, recipe.ingredients)), id: \.1) { index, ingredient in
-                Text("- \(ingredient)")
+            Text("Ingredients: \(recipe.ingredients)")
+            Text("Steps: \(recipe.steps)")
+            if setting.showEnergy {
+                Text("Energy: \(String(format: "%.1f", recipe.nutrition.energy)) kcal")
             }
-            Text("Steps:")
-            ForEach(Array(zip(recipe.steps.indices, recipe.steps)), id: \.1) { index, step in
-                Text("\(step)")
+            if setting.showWater {
+                Text("Water: \(String(format: "%.1f", recipe.nutrition.water)) g")
             }
-            if settings.showEnergy {
-                Text("Energy: \(recipe.nutrition.energy) kcal")
+            if setting.showCarbohydrate {
+                Text("Carbohydrate: \(String(format: "%.1f", recipe.nutrition.carbohydrate)) g")
             }
-            if settings.showWater {
-                Text("Water: \(recipe.nutrition.water) g")
+            if setting.showSugars {
+                Text("Sugars: \(String(format: "%.1f", recipe.nutrition.sugars)) g")
             }
-            if settings.showCarbohydrate {
-                Text("Carbohydrate: \(recipe.nutrition.carbohydrate) g")
+            if setting.showProtein {
+                Text("Protein: \(String(format: "%.1f", recipe.nutrition.protein)) g")
             }
-            if settings.showSugars {
-                Text("Sugars: \(recipe.nutrition.sugars) g")
+            if setting.showFat {
+                Text("Fat: \(String(format: "%.1f", recipe.nutrition.fat)) g")
             }
-            if settings.showProtein {
-                Text("Protein: \(recipe.nutrition.protein) g")
-            }
-            if settings.showFat {
-                Text("Fat: \(recipe.nutrition.fat) g")
-            }
-//            Toggle(isOn: $recipe.isFavorite) {
-//                Text("Favorite")
-//            }
             Toggle("Favorite", isOn: $recipe.isFavorite)
         }
        .padding()
        .navigationTitle(recipe.name)
-    }
-}
-
-
-struct RecipeListView_Previews: PreviewProvider {
-    static var previews: some View {
-        RecipeListView()
     }
 }

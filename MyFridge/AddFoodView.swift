@@ -8,13 +8,17 @@
 import SwiftUI
 import PhotosUI
 import AVFoundation
+import SwiftData
 
 struct AddFoodView: View {
     @State private var foodName: String = ""
     @State private var expirationDate: Date = Date()
     @State private var quantity: Int = 1
+    @State private var unit: String = ""
     @State private var detail: String = ""
     @State private var showCamera = false
+    @State private var capturedImageData: Data?
+    @Environment(\.modelContext) var modelContext
 
     var body: some View {
         NavigationView {
@@ -25,6 +29,7 @@ struct AddFoodView: View {
                     Stepper(value: $quantity, in: 1...100) {
                         Text("Quantity: \(quantity)")
                     }
+                    TextField("Unit:", text: $unit)
                     TextField("More Detail", text: $detail)
                 }
                 Section(header: Text("Image")) {
@@ -38,9 +43,11 @@ struct AddFoodView: View {
                 }
                 Section {
                     Button(action: {
-                        let newNutrition = Nutrition(energy: 0, water: 0, carbohydrate: 0, sugars: 0, protein: 0, fat: 0)
-                        let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, imageName: nil, detail: detail, nutrition: newNutrition, recipes: [])
-                        foodList.append(newFood)
+                        let newNutrition = Nutrition(energy: 1, water: 2, carbohydrate: 3, sugars: 4, protein: 5, fat: 6)
+//                        let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, unit: unit, image: capturedImageData, detail: detail, nutrition: newNutrition, ingredients: [])
+                        let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, unit: unit, image: capturedImageData, detail: detail, nutrition: newNutrition)
+                        modelContext.insert(newFood)
+                        try? modelContext.save()
                     }) {
                         Text("Save Food")
                     }
@@ -48,8 +55,10 @@ struct AddFoodView: View {
             }
           .sheet(isPresented: $showCamera) {
                 CameraView(isShown: $showCamera) { image in
-                    // Save image to Photos library
-                    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+                    // Store image as Data in Food
+                    if let imageData = image.jpegData(compressionQuality: 0.8) {
+                        capturedImageData = imageData
+                    }
                 }
             }
           .navigationTitle("Add Food")

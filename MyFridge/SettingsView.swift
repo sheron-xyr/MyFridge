@@ -6,39 +6,40 @@
 //
 
 import SwiftUI
+import SwiftData
 
-class GlobalSettings: ObservableObject {
-    @Published var settings = Settings(showEnergy: true, showWater: true, showCarbohydrate: false, showSugars: false, showProtein: false, showFat: false, daysUntilNearExpiration: 3)
-}
 
 struct SettingsView: View {
-    @ObservedObject var globalSettings = GlobalSettings()
-
+    @Environment(\.modelContext) var modelContext
+    @Bindable var userSetting: UserSettings
+    
     var body: some View {
         NavigationView {
-            Form {
+                Form {
                 Section(header: Text("Expiration Settings")) {
-                    Stepper(value: $globalSettings.settings.daysUntilNearExpiration, in: 1...30) {
-                        Text("Days until near expiration: \(globalSettings.settings.daysUntilNearExpiration)")
+                    Stepper(value: $userSetting.daysUntilNearExpiration, in: 1...30) {
+                        Text("Days until near expiration: \(userSetting.daysUntilNearExpiration)")
                     }
                 }
                 Section(header: Text("Nutrition Display")) {
-                    Toggle("Show Energy", isOn: $globalSettings.settings.showEnergy)
-                    Toggle("Show Water", isOn: $globalSettings.settings.showWater)
-                    Toggle("Show Carbohydrate", isOn: $globalSettings.settings.showCarbohydrate)
-                    Toggle("Show Sugars", isOn: $globalSettings.settings.showSugars)
-                    Toggle("Show Protein", isOn: $globalSettings.settings.showProtein)
-                    Toggle("Show Fat", isOn: $globalSettings.settings.showFat)
+                    Toggle("Show Energy", isOn: $userSetting.showEnergy)
+                    Toggle("Show Water", isOn: $userSetting.showWater)
+                    Toggle("Show Carbohydrate", isOn: $userSetting.showCarbohydrate)
+                    Toggle("Show Sugars", isOn: $userSetting.showSugars)
+                    Toggle("Show Protein", isOn: $userSetting.showProtein)
+                    Toggle("Show Fat", isOn: $userSetting.showFat)
                 }
                 Section {
                     Button(action: {
-                        NotificationCenter.default.post(name: Notification.Name("SettingsUpdated"), object: nil)
+                        try? modelContext.save()
+                        //                        NotificationCenter.default.post(name: Notification.Name("SettingsUpdated"), object: nil)
                     }) {
                         Text("Save Settings")
                     }
                 }
             }
           .navigationTitle("Settings")
+          
         }
     }
 }
