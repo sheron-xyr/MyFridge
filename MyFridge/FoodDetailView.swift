@@ -80,6 +80,8 @@ struct FoodDetailView: View {
                 Text("Fat: \(String(format: "%.1f", food.nutrition.fat)) g")
             }
             
+            Text("Other details: \(food.detail)")
+            
         // TODO: why hidden shows error: Argument passed to call that takes no arguments
 //            Text("Energy: \(food.nutrition.energy) kcal")
 //                .hidden(!setting.showEnergy)

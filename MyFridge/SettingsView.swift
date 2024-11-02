@@ -29,14 +29,14 @@ struct SettingsView: View {
                     Toggle("Show Protein", isOn: $userSetting.showProtein)
                     Toggle("Show Fat", isOn: $userSetting.showFat)
                 }
-                Section {
-                    Button(action: {
-                        try? modelContext.save()
-                        //                        NotificationCenter.default.post(name: Notification.Name("SettingsUpdated"), object: nil)
-                    }) {
-                        Text("Save Settings")
-                    }
-                }
+//                Section {
+//                    Button(action: {
+//                        try? modelContext.save()
+//                        //                        NotificationCenter.default.post(name: Notification.Name("SettingsUpdated"), object: nil)
+//                    }) {
+//                        Text("Save Settings")
+//                    }
+//                }
             }
           .navigationTitle("Settings")
           
