@@ -1,0 +1,30 @@
+# Xcode
+.DS_Store
+xcuserdata/
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata
+**/xcshareddata/WorkspaceSettings.xcsettings
+
+# Build
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Xcode Bookmarks
+*.xcbkptlist
+
+# Other
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+*.xcuserstate
+.DS_Store
+.idea/
