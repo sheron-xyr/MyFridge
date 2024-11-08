@@ -28,11 +28,8 @@ struct ContentView: View {
             
             NavigationStack {
                 FoodListView(sort: foodSortOrder, searchText: foodSearchText)
-                
-                // search bar
-                    .searchable(text: $foodSearchText)
                     .toolbar {
-                        ToolbarItemGroup(placement:.navigationBarTrailing) {
+                        ToolbarItem(placement:.navigationBarTrailing) {
                             Picker("Sort", selection: $foodSortOrder) {
                                 Text("Expiration Date (Near to Far)")
                                     .tag(SortDescriptor(\Food.expirationDate))
@@ -44,21 +41,24 @@ struct ContentView: View {
                         }
                     }
                     
-            }.tabItem {
+            }
+            .searchable(text: $foodSearchText)
+            .tabItem {
                 Label("Food List", systemImage: "list.bullet")
             }
             
             NavigationStack{
-            RecipeListView(searchString: recipeSearchText, showFavoriteOnly: showOnlyFavorites)
-                
-                .searchable(text: $recipeSearchText)
-                .toolbar {
-                    ToolbarItem(placement:.navigationBarTrailing) {
-                        Toggle(isOn: $showOnlyFavorites) {
-                            Text("Only Favorites")
+                RecipeListView(searchString: recipeSearchText, showFavoriteOnly: showOnlyFavorites)
+                    
+                    .toolbar {
+                        ToolbarItem(placement:.navigationBarTrailing) {
+                            Toggle(isOn: $showOnlyFavorites) {
+                                Text("Only Favorites")
+                            }
                         }
                     }
-                }}
+            }
+            .searchable(text: $recipeSearchText)
                 .tabItem {
                     Label("Recipe List", systemImage: "book")
                 }
@@ -84,7 +84,9 @@ struct ContentView: View {
             }
             if foodList.isEmpty {
                 let food1 = Food(name: "apple", expirationDate: Date(), quantity: 1, unit: "piece")
+                let food2 = Food(name: "banana", expirationDate: Date(), quantity: 2, unit: "pieces")
                 modelContext.insert(food1)
+                modelContext.insert(food2)
                 try? modelContext.save()
             }
             if recipeList.isEmpty {

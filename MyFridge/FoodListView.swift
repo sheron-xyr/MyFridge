@@ -11,7 +11,7 @@ import SwiftData
 
 struct FoodListView: View {
     @Environment(\.modelContext) var modelContext
-//    @State private var searchText = ""
+    @State private var refreshID = UUID()
 //    @State private var sortOrder = SortDescriptor(\Food.expirationDate)
     @Query(sort: [SortDescriptor(\Food.expirationDate), SortDescriptor(\Food.name)]) var foodList: [Food]
     @Query var userSettings: [UserSettings]
@@ -93,6 +93,9 @@ struct FoodListView: View {
             .navigationTitle("Food List")
             .navigationDestination(for: Food.self) { food in
                 FoodDetailView(food: food)
+            }
+            .onAppear{
+                refreshID = UUID()
             }
         }
         

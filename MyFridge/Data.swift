@@ -30,6 +30,13 @@ class UserSettings {
     }
 }
 
+enum NError: Error {
+    case invalidURL
+    case invalidResponse
+    case invalidJSON
+}
+
+
 @Model
 class Nutrition {
     var energy: Double // kcal
@@ -39,13 +46,52 @@ class Nutrition {
     var protein: Double // g
     var fat: Double // g
     
-    init(energy: Double = 0, water: Double = 0, carbohydrate: Double = 0, sugars: Double = 0, protein: Double = 0, fat: Double = 0) {
+    init(energy: Double = -1, water: Double = -1, carbohydrate: Double = -1, sugars: Double = -1, protein: Double = -1, fat: Double = -1) {
         self.energy = energy
         self.water = water
         self.carbohydrate = carbohydrate
         self.sugars = sugars
         self.protein = protein
         self.fat = fat
+    }
+    
+    static func fromJSON(_ data: Data) throws -> Nutrition {
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw NError.invalidJSON
+        }
+        
+        let foodNutrients = (json["foods"] as? [[String: Any]])?.first?["foodNutrients"] as? [[String: Any]] ?? []
+        
+        var energy: Double = -1
+        var water: Double = -1
+        var carbohydrate: Double = -1
+        var sugars: Double = -1
+        var protein: Double = -1
+        var fat: Double = -1
+        
+        for nutrient in foodNutrients {
+            if let nutrientId = nutrient["nutrientId"] as? Int,
+               let value = nutrient["value"] as? Double {
+                switch nutrientId {
+                case 2047:
+                    energy = value
+                case 1051:
+                    water = value
+                case 1005:
+                    carbohydrate = value
+                case 2000:
+                    sugars = value
+                case 1003:
+                    protein = value
+                case 1004:
+                    fat = value
+                default:
+                    continue
+                }
+            }
+        }
+        
+        return Nutrition(energy: energy, water: water, carbohydrate: carbohydrate, sugars: sugars, protein: protein, fat: fat)
     }
 }
 
