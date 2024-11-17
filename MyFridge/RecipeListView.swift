@@ -12,22 +12,22 @@ struct RecipeListView: View {
     @Environment(\.modelContext) var modelContext
     @Query(sort: [SortDescriptor(\Recipe.name)]) var recipeList: [Recipe]
     @Query var userSettings: [UserSettings]
-
+    
     init(searchString: String, showFavoriteOnly: Bool) {
-            _recipeList = Query(filter: #Predicate {
-                if showFavoriteOnly {
-                    return $0.isFavorite && (searchString.isEmpty || $0.name.localizedStandardContains(searchString))
-                    
-                } else {
-                    return searchString.isEmpty || $0.name.localizedStandardContains(searchString)
-                }
-            })
-        }
-
+        _recipeList = Query(filter: #Predicate {
+            if showFavoriteOnly {
+                return $0.isFavorite && (searchString.isEmpty || $0.name.localizedStandardContains(searchString))
+                
+            } else {
+                return searchString.isEmpty || $0.name.localizedStandardContains(searchString)
+            }
+        })
+    }
+    
     var body: some View {
         NavigationStack {
             VStack {
-
+                
                 List {
                     ForEach(recipeList) { recipe in
                         HStack {
@@ -57,10 +57,10 @@ struct RecipeListView: View {
                         .cornerRadius(8)
                 }
             }
-           .navigationTitle("Recipe List")
-           .navigationDestination(for: Recipe.self) { recipe in
-               RecipeDetailView(recipe: recipe)
-           }
+            .navigationTitle("Recipe List")
+            .navigationDestination(for: Recipe.self) { recipe in
+                RecipeDetailView(recipe: recipe)
+            }
         }
     }
     func deleteRecipes(_ indexSet: IndexSet) {
@@ -75,7 +75,7 @@ struct RecipeDetailView: View {
     @Environment(\.modelContext) var modelContext
     @Bindable var recipe : Recipe
     @Query var userSettings: [UserSettings]
-
+    
     var body: some View {
         let setting : UserSettings = userSettings.first!
         VStack(alignment:.leading) {
@@ -85,8 +85,8 @@ struct RecipeDetailView: View {
                     .frame(width: 300, height: 300)
             } else {
                 Image(systemName: "photo.badge.plus")
-                   .resizable()
-                   .frame(width: 300, height: 300)
+                    .resizable()
+                    .frame(width: 300, height: 300)
             }
             Text("Ingredients: \(recipe.ingredients)")
             Text("Steps: \(recipe.steps)")
@@ -141,7 +141,7 @@ struct RecipeDetailView: View {
             }
             Toggle("Favorite", isOn: $recipe.isFavorite)
         }
-       .padding()
-       .navigationTitle(recipe.name)
+        .padding()
+        .navigationTitle(recipe.name)
     }
 }

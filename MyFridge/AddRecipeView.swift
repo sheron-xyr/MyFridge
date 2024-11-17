@@ -48,7 +48,7 @@ struct AddRecipeView: View {
             }
             Section {
                 Button(action: {
-                    // TODO: navigate to Recipe List page after saving
+                    // TODO: navigate to Recipe List Page after saving
                     let newRecipe = Recipe(name: recipeName, image: capturedImageData, steps: steps, isFavorite: isFavorite, ingredients: ingredients)
                     modelContext.insert(newRecipe)
                     try? modelContext.save()

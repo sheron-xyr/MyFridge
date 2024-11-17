@@ -13,11 +13,11 @@ struct FoodDetailView: View {
     @Bindable var food : Food
     @Query var userSettings: [UserSettings]
     @State private var isEditing = false
-
+    
     var body: some View {
         let setting : UserSettings = userSettings.first!
         VStack(alignment:.leading) {
-
+            
             if let imageData = food.image, let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
                     .resizable()
@@ -33,7 +33,7 @@ struct FoodDetailView: View {
                     HStack{
                         Text("Quantity: ")
                         TextField("Quantity: ", value: $food.quantity, format:.number)
-                           .keyboardType(.numberPad)
+                            .keyboardType(.numberPad)
                         Text(" \(food.unit)")
                     }
                     
@@ -44,7 +44,7 @@ struct FoodDetailView: View {
                     Text("Quantity: \(food.quantity) \(food.unit)")
                     Text("Expiration Date: \(food.expirationDate.formatted(date: .abbreviated, time: .omitted)), \(food.expirationDaysLeft) days left")
                         .foregroundColor(food.expirationDaysLeft <= userSettings.first!.daysUntilNearExpiration ? .red : .primary)
-
+                    
                 }
             }
             
@@ -99,8 +99,8 @@ struct FoodDetailView: View {
             }
             
             Text("Other details: \(food.detail)")
-
-
+            
+            
             Button(action: {
                 if isEditing {
                     try? modelContext.save()
@@ -116,7 +116,7 @@ struct FoodDetailView: View {
                 }
             }
         }
-       .padding()
-       .navigationTitle(food.name)
+        .padding()
+        .navigationTitle(food.name)
     }
 }

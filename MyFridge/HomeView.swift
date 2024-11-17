@@ -16,15 +16,15 @@ struct HomeView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding()
-
-
+            
+            
             Image(systemName: "refrigerator")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(10)
                 .padding(40)
-
-
+            
+            
             Text("Oh no! Some things are about to expire")
                 .font(.title)
         }

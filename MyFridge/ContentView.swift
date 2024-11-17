@@ -40,7 +40,7 @@ struct ContentView: View {
                             .pickerStyle(.inline)
                         }
                     }
-                    
+                
             }
             .searchable(text: $foodSearchText)
             .tabItem {
@@ -49,7 +49,7 @@ struct ContentView: View {
             
             NavigationStack{
                 RecipeListView(searchString: recipeSearchText, showFavoriteOnly: showOnlyFavorites)
-                    
+                
                     .toolbar {
                         ToolbarItem(placement:.navigationBarTrailing) {
                             Toggle(isOn: $showOnlyFavorites) {
@@ -59,9 +59,9 @@ struct ContentView: View {
                     }
             }
             .searchable(text: $recipeSearchText)
-                .tabItem {
-                    Label("Recipe List", systemImage: "book")
-                }
+            .tabItem {
+                Label("Recipe List", systemImage: "book")
+            }
             
             
             if let firstUserSetting = userSettings.first {

@@ -15,7 +15,7 @@ struct SettingsView: View {
     
     var body: some View {
         NavigationView {
-                Form {
+            Form {
                 Section(header: Text("Expiration Settings")) {
                     Stepper(value: $userSetting.daysUntilNearExpiration, in: 1...30) {
                         Text("Days until near expiration: \(userSetting.daysUntilNearExpiration)")
@@ -30,8 +30,8 @@ struct SettingsView: View {
                     Toggle("Show Fat", isOn: $userSetting.showFat)
                 }
             }
-          .navigationTitle("Settings")
-          
+            .navigationTitle("Settings")
+            
         }
     }
 }

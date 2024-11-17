@@ -15,15 +15,15 @@ struct FoodListView: View {
     @Query var userSettings: [UserSettings]
     
     init(sort: SortDescriptor<Food>, searchText: String) {
-            _foodList = Query(filter: #Predicate {
-                if searchText.isEmpty {
-                    return true
-                } else {
-                    return $0.name.localizedStandardContains(searchText)
-                }
-            }, sort: [sort])
-        }
-
+        _foodList = Query(filter: #Predicate {
+            if searchText.isEmpty {
+                return true
+            } else {
+                return $0.name.localizedStandardContains(searchText)
+            }
+        }, sort: [sort])
+    }
+    
     
     
     var body: some View {
@@ -57,7 +57,7 @@ struct FoodListView: View {
                     .onDelete(perform: deleteFoods)
                 }
                 
-
+                
                 NavigationLink(destination: AddFoodView()) {
                     Text("Add Food")
                         .frame(maxWidth:.infinity)
@@ -74,12 +74,12 @@ struct FoodListView: View {
         }
         
     }
-        
+    
     func deleteFoods(_ indexSet: IndexSet) {
         for index in indexSet {
             let food = foodList[index]
             modelContext.delete(food)
         }
     }
-
+    
 }
