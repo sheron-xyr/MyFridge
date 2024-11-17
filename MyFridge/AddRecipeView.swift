@@ -25,7 +25,6 @@ struct AddRecipeView: View {
     
     
     var body: some View {
-        //        NavigationStack {
         Form {
             Section(header: Text("Recipe Information")) {
                 TextField("Recipe Name: ", text: $recipeName)
@@ -33,7 +32,6 @@ struct AddRecipeView: View {
                 TextField("Ingredients: ", text: $ingredients)
                 Toggle("Favorite", isOn: $isFavorite)
             }
-            //
             Section(header: Text("Image")) {
                 Button(action: {
                     showCamera = true
@@ -51,11 +49,6 @@ struct AddRecipeView: View {
             Section {
                 Button(action: {
                     // TODO: navigate to Recipe List page after saving
-                    Task {
-                        //                        let newNutrition = Nutrition(energy: 1, water: 2, carbohydrate: 3, sugars: 4, protein: 5, fat: 6)
-                        //                        let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, unit: unit, image: capturedImageData, detail: detail, nutrition: newNutrition, ingredients: [])
-                       
-                    }
                     let newRecipe = Recipe(name: recipeName, image: capturedImageData, steps: steps, isFavorite: isFavorite, ingredients: ingredients)
                     modelContext.insert(newRecipe)
                     try? modelContext.save()
@@ -67,9 +60,6 @@ struct AddRecipeView: View {
         }
         .sheet(isPresented: $showCamera) {
             CameraView(isShown: $showCamera) { image in
-                //                    originalImage = image
-                //                    processImage(image)
-                // Store image as Data in Recipe
                 if let imageData = image.jpegData(compressionQuality: 0.8) {
                     capturedImageData = imageData
                 }
@@ -79,6 +69,5 @@ struct AddRecipeView: View {
             Alert(title: Text("Alert"), message: Text("New recipe saved!"))
         }
         .navigationTitle("Add Recipe")
-        //        }
     }
 }

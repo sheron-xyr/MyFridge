@@ -82,20 +82,6 @@ struct ContentView: View {
                 modelContext.insert(defaultSettings)
                 try? modelContext.save()
             }
-            if foodList.isEmpty {
-                let food1 = Food(name: "apple", expirationDate: Date(), quantity: 1, unit: "piece")
-                let food2 = Food(name: "banana", expirationDate: Date(), quantity: 2, unit: "pieces")
-                modelContext.insert(food1)
-                modelContext.insert(food2)
-                try? modelContext.save()
-            }
-            if recipeList.isEmpty {
-                let recipe1 = Recipe(name: "Banana Smoothie", steps: "Peel and slice the bananas.\n Put the bananas, milk, yogurt, and honey in a blender.\n Blend until smooth.", nutrition: Nutrition(energy: 250, water: 75.11, carbohydrate: 40.0, sugars: 30, protein: 5, fat: 5), isFavorite: true, ingredients: "banana\n milk")
-                let recipe2 = Recipe(name: "Banana Pancake", steps: "In a large bowl, combine the flour, sugar, baking powder, and salt.\n In a separate bowl, beat the egg. Add the milk and melted butter and stir to combine.\n Pour the wet ingredients into the dry ingredients and stir until just combined. Do not overmix.", nutrition: Nutrition(energy: 300, water: 40, carbohydrate: 50.0, sugars: 15, protein: 8, fat: 10), isFavorite: false, ingredients: "banana\n butter\n flour")
-                modelContext.insert(recipe1)
-                modelContext.insert(recipe2)
-                try? modelContext.save()
-            }
         }
     }
 }

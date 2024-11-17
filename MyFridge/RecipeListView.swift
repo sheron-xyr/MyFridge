@@ -10,8 +10,6 @@ import SwiftData
 
 struct RecipeListView: View {
     @Environment(\.modelContext) var modelContext
-//    @State private var searchText = ""
-//    @State private var showOnlyFavorites = false
     @Query(sort: [SortDescriptor(\Recipe.name)]) var recipeList: [Recipe]
     @Query var userSettings: [UserSettings]
 
@@ -29,15 +27,6 @@ struct RecipeListView: View {
     var body: some View {
         NavigationStack {
             VStack {
-//                TextField("Search", text: $searchText)
-//                   .padding()
-//                   .background(Color(.systemGray6))
-//                   .cornerRadius(8)
-
-//                Toggle(isOn: $showOnlyFavorites) {
-//                    Text("Only Favorites")
-//                }
-//               .padding()
 
                 List {
                     ForEach(recipeList) { recipe in
@@ -90,8 +79,6 @@ struct RecipeDetailView: View {
     var body: some View {
         let setting : UserSettings = userSettings.first!
         VStack(alignment:.leading) {
-//            Text(recipe.name)
-//               .font(.title)
             if let imageData = recipe.image, let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
                     .resizable()

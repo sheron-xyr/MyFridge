@@ -26,7 +26,6 @@ struct AddFoodView: View {
     @State private var originalImage: UIImage?
     @State private var nutrition: Nutrition?
     @State private var successed: Bool = false
-//    @State private var cropRect: CGRect = CGRect(x: 0, y: 0, width: 100, height: 100)
 
     
     func getNutrition() async throws -> Nutrition {
@@ -50,7 +49,7 @@ struct AddFoodView: View {
     func processImage(_ image: UIImage) {
         selectedFoodName = nil
         recognizedText = nil
-            guard let cgImage = image.cgImage  else { return }
+        guard let cgImage = image.cgImage  else { return }
             let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
             let classifyRequest = VNClassifyImageRequest()
             let textRecognitionRequest = VNRecognizeTextRequest()
@@ -60,10 +59,6 @@ struct AddFoodView: View {
                     let filteredResults = results.filter { $0.confidence > 0.5 }.sorted { $0.confidence > $1.confidence }
                     selectedFoodName = filteredResults.map { "\($0.identifier) \($0.confidence)" }
                         .joined(separator: "\n")
-//                    let filteredResults = results.filter { $0.confidence > 0.7 }.sorted { $0.confidence > $1.confidence }
-//                    if let firstResult = filteredResults.first {
-//                        selectedFoodName = firstResult.identifier
-//                    }
                 }
                 if let results = textRecognitionRequest.results {
                     if let topResult = results.first?.topCandidates(1).first {
@@ -77,7 +72,6 @@ struct AddFoodView: View {
         }
     
     var body: some View {
-//        NavigationStack {
             Form {
                 Section(header: Text("Food Information")) {
                     TextField("Food Name: ", text: $foodName)
@@ -123,8 +117,6 @@ struct AddFoodView: View {
                 Section {
                     Button(action: {
                         // TODO: navigate to FoodList page after saving
-                        // A NavigationLink is presenting a value of type “Food” but there is no matching navigationDestination declaration visible from the location of the link. The link cannot be activated.
-                        // Note: Links search for destinations in any surrounding NavigationStack, then within the same column of a NavigationSplitView.
                         Task {
                             do {
                                 nutrition = try await getNutrition()
@@ -137,15 +129,11 @@ struct AddFoodView: View {
                             } catch {
                                 print("unexpected error happened when fetching nutrition data")
                             }
-                       
-//                        let newNutrition = Nutrition(energy: 1, water: 2, carbohydrate: 3, sugars: 4, protein: 5, fat: 6)
-//                        let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, unit: unit, image: capturedImageData, detail: detail, nutrition: newNutrition, ingredients: [])
                             let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, unit: unit, image: capturedImageData, detail: detail, nutrition: nutrition ?? Nutrition())
                             modelContext.insert(newFood)
                             try? modelContext.save()
                             successed = true
                         }
-//                        NavigationLink(destination: FoodListView(sort: SortDescriptor(\Food.expirationDate), searchText: "")) {}
                     }) {
                         Text("Save Food")
                     }
@@ -153,9 +141,6 @@ struct AddFoodView: View {
             }
             .sheet(isPresented: $showCamera) {
                 CameraView(isShown: $showCamera) { image in
-//                    originalImage = image
-//                    processImage(image)
-                    // Store image as Data in Food
                     if let imageData = image.jpegData(compressionQuality: 0.8) {
                         capturedImageData = imageData
                         originalImage = image
@@ -167,67 +152,5 @@ struct AddFoodView: View {
                 Alert(title: Text("Alert"), message: Text("New food saved!"))
             }
             .navigationTitle("Add Food")
-//        }
     }
 }
-
-//import SwiftUI
-//import PhotosUI
-//import AVFoundation
-//import SwiftData
-//
-//struct AddFoodView: View {
-//    @State private var foodName: String = ""
-//    @State private var expirationDate: Date = Date()
-//    @State private var quantity: Int = 1
-//    @State private var unit: String = ""
-//    @State private var detail: String = ""
-//    @State private var showCamera = false
-//    @State private var capturedImageData: Data?
-//    @Environment(\.modelContext) var modelContext
-//    
-//    var body: some View {
-//        NavigationView {
-//            Form {
-//                Section(header: Text("Food Information")) {
-//                    TextField("Food Name", text: $foodName)
-//                    DatePicker("Expiration Date", selection: $expirationDate, displayedComponents:.date)
-//                    Stepper(value: $quantity, in: 1...100) {
-//                        Text("Quantity: \(quantity)")
-//                    }
-//                    TextField("Unit:", text: $unit)
-//                    TextField("More Detail", text: $detail)
-//                }
-//                Section(header: Text("Image")) {
-//                    Button(action: {
-//                        showCamera = true
-//                    }) {
-//                        Image(systemName: "camera")
-//                            .resizable()
-//                            .frame(width: 50, height: 50)
-//                    }
-//                }
-//                Section {
-//                    Button(action: {
-//                        let newNutrition = Nutrition(energy: 1, water: 2, carbohydrate: 3, sugars: 4, protein: 5, fat: 6)
-//                        //                        let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, unit: unit, image: capturedImageData, detail: detail, nutrition: newNutrition, ingredients: [])
-//                        let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, unit: unit, image: capturedImageData, detail: detail, nutrition: newNutrition)
-//                        modelContext.insert(newFood)
-//                        try? modelContext.save()
-//                    }) {
-//                        Text("Save Food")
-//                    }
-//                }
-//            }
-//            .sheet(isPresented: $showCamera) {
-//                CameraView(isShown: $showCamera) { image in
-//                    // Store image as Data in Food
-//                    if let imageData = image.jpegData(compressionQuality: 0.8) {
-//                        capturedImageData = imageData
-//                    }
-//                }
-//            }
-//            .navigationTitle("Add Food")
-//        }
-//    }
-//}

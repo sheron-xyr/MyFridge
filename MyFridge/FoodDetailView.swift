@@ -12,24 +12,11 @@ struct FoodDetailView: View {
     @Environment(\.modelContext) var modelContext
     @Bindable var food : Food
     @Query var userSettings: [UserSettings]
-//    @State private var pfood : Food = foodList[0]
     @State private var isEditing = false
-//    @State private var newQuantity: Int?
-//    @State private var newExpirationDate: Date
-    
-//    init(food: Food, pfood: Food = foodList[0], isEditing: Bool = false, newQuantity: Int? = nil, newExpirationDate: Date = Date()) {
-//        self.food = food
-//        self.pfood = food
-//        self.isEditing = isEditing
-//        self.newQuantity = newQuantity
-//        self.newExpirationDate = newExpirationDate
-//    }
 
     var body: some View {
         let setting : UserSettings = userSettings.first!
         VStack(alignment:.leading) {
-//            Text(pfood.name)
-//               .font(.title)
 
             if let imageData = food.image, let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
@@ -112,17 +99,6 @@ struct FoodDetailView: View {
             }
             
             Text("Other details: \(food.detail)")
-            
-        // TODO: why hidden shows error: Argument passed to call that takes no arguments
-//            Text("Energy: \(food.nutrition.energy) kcal")
-//                .hidden(!setting.showEnergy)
-
-//            if !food.recipes.isEmpty {
-//                Text("Recipes:")
-//                ForEach(food.recipes) { recipe in
-//                    Text(recipe.name)
-//                }
-//            }
 
 
             Button(action: {
@@ -144,9 +120,3 @@ struct FoodDetailView: View {
        .navigationTitle(food.name)
     }
 }
-//
-//struct FoodDetailView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        FoodDetailView(food: foodList[0])
-//    }
-//}
