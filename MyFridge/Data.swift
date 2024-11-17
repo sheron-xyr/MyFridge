@@ -156,7 +156,7 @@ class Recipe {
     var ingredients: String
 //    @Relationship(deleteRule: .cascade, inverse: \Ingredient.recipe) var ingredients: [Ingredient] = []
     
-    init(name: String, image: Data? = nil, steps: String, nutrition: Nutrition, isFavorite: Bool = false, ingredients: String) {
+    init(name: String, image: Data? = nil, steps: String, nutrition: Nutrition = Nutrition(), isFavorite: Bool = false, ingredients: String) {
         self.name = name
         self.image = image
         self.steps = steps

@@ -30,6 +30,7 @@ struct AddFoodView: View {
 
     
     func getNutrition() async throws -> Nutrition {
+        // TODO: remember to use your own api key
         let endpoint = "https://api.nal.usda.gov/fdc/v1/foods/search?api_key=Ygutx3ChhbAXlA0aB9xMGdPxZhcFBNKLeaMbYXOP&query=" + foodName + "&dataType=Foundation&pageSize=1&pageNumber=1"
         guard let url = URL(string: endpoint) else {
             throw NError.invalidURL
@@ -47,6 +48,8 @@ struct AddFoodView: View {
     
     
     func processImage(_ image: UIImage) {
+        selectedFoodName = nil
+        recognizedText = nil
             guard let cgImage = image.cgImage  else { return }
             let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
             let classifyRequest = VNClassifyImageRequest()
@@ -74,16 +77,16 @@ struct AddFoodView: View {
         }
     
     var body: some View {
-        NavigationStack {
+//        NavigationStack {
             Form {
                 Section(header: Text("Food Information")) {
-                    TextField("Food Name", text: $foodName)
-                    DatePicker("Expiration Date", selection: $expirationDate, displayedComponents:.date)
+                    TextField("Food Name: ", text: $foodName)
+                    DatePicker("Expiration Date: ", selection: $expirationDate, displayedComponents:.date)
                     Stepper(value: $quantity, in: 1...100) {
                         Text("Quantity: \(quantity)")
                     }
-                    TextField("Unit:", text: $unit)
-                    TextField("More Detail", text: $detail)
+                    TextField("Unit: ", text: $unit)
+                    TextField("More Detail: ", text: $detail)
                 }
                 //    TODO: write guidance for taking photos for better image classification
                 Section(header: Text("Image"), footer: Text("Guidance for taking photos")) {
@@ -134,13 +137,14 @@ struct AddFoodView: View {
                             } catch {
                                 print("unexpected error happened when fetching nutrition data")
                             }
-                        }
+                       
 //                        let newNutrition = Nutrition(energy: 1, water: 2, carbohydrate: 3, sugars: 4, protein: 5, fat: 6)
 //                        let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, unit: unit, image: capturedImageData, detail: detail, nutrition: newNutrition, ingredients: [])
-                        let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, unit: unit, image: capturedImageData, detail: detail, nutrition: nutrition ?? Nutrition())
-                        modelContext.insert(newFood)
-                        try? modelContext.save()
-                        successed = true
+                            let newFood = Food(name: foodName, expirationDate: expirationDate, quantity: quantity, unit: unit, image: capturedImageData, detail: detail, nutrition: nutrition ?? Nutrition())
+                            modelContext.insert(newFood)
+                            try? modelContext.save()
+                            successed = true
+                        }
 //                        NavigationLink(destination: FoodListView(sort: SortDescriptor(\Food.expirationDate), searchText: "")) {}
                     }) {
                         Text("Save Food")
@@ -163,7 +167,7 @@ struct AddFoodView: View {
                 Alert(title: Text("Alert"), message: Text("New food saved!"))
             }
             .navigationTitle("Add Food")
-        }
+//        }
     }
 }
 

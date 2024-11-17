@@ -62,22 +62,53 @@ struct FoodDetailView: View {
             }
             
             if setting.showEnergy {
-                Text("Energy: \(String(format: "%.1f", food.nutrition.energy)) kcal")
+                if food.nutrition.energy != -1 {
+                    Text("Energy: \(String(format: "%.1f", food.nutrition.energy)) kcal")
+                }
+                else {
+                    Text("Energy: unknown")
+                }
             }
             if setting.showWater {
-                Text("Water: \(String(format: "%.1f", food.nutrition.water)) g")
+                if food.nutrition.water != -1 {
+                    Text("Water: \(String(format: "%.1f", food.nutrition.water)) g")
+                }
+                else {
+                    Text("Water: unknown")
+                }
             }
             if setting.showCarbohydrate {
-                Text("Carbohydrate: \(String(format: "%.1f", food.nutrition.carbohydrate)) g")
+                if food.nutrition.carbohydrate != -1 {
+                    Text("Carbohydrate: \(String(format: "%.1f", food.nutrition.carbohydrate)) g")
+                }
+                else {
+                    Text("Carbohydrate: unknown")
+                }
             }
             if setting.showSugars {
-                Text("Sugars: \(String(format: "%.1f", food.nutrition.sugars)) g")
+                if food.nutrition.sugars != -1 {
+                    Text("Sugars: \(String(format: "%.1f", food.nutrition.sugars)) g")
+                }
+                else {
+                    Text("Sugars: unknown")
+                }
             }
             if setting.showProtein {
-                Text("Protein: \(String(format: "%.1f", food.nutrition.protein)) g")
+                if food.nutrition.protein != -1 {
+                    Text("Protein: \(String(format: "%.1f", food.nutrition.protein)) g")
+                }
+                else {
+                    Text("Protein: unknown")
+                }
+                
             }
             if setting.showFat {
-                Text("Fat: \(String(format: "%.1f", food.nutrition.fat)) g")
+                if food.nutrition.fat != -1 {
+                    Text("Fat: \(String(format: "%.1f", food.nutrition.fat)) g")
+                }
+                else {
+                    Text("Fat: unknown")
+                }
             }
             
             Text("Other details: \(food.detail)")

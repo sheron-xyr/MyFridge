@@ -59,6 +59,14 @@ struct RecipeListView: View {
                     }
                     .onDelete(perform: deleteRecipes)
                 }
+                NavigationLink(destination: AddRecipeView()) {
+                    Text("Add Recipe")
+                        .frame(maxWidth:.infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
             }
            .navigationTitle("Recipe List")
            .navigationDestination(for: Recipe.self) { recipe in
@@ -96,22 +104,53 @@ struct RecipeDetailView: View {
             Text("Ingredients: \(recipe.ingredients)")
             Text("Steps: \(recipe.steps)")
             if setting.showEnergy {
-                Text("Energy: \(String(format: "%.1f", recipe.nutrition.energy)) kcal")
+                if recipe.nutrition.energy != -1 {
+                    Text("Energy: \(String(format: "%.1f", recipe.nutrition.energy)) kcal")
+                }
+                else {
+                    Text("Energy: unknown")
+                }
             }
             if setting.showWater {
-                Text("Water: \(String(format: "%.1f", recipe.nutrition.water)) g")
+                if recipe.nutrition.water != -1 {
+                    Text("Water: \(String(format: "%.1f", recipe.nutrition.water)) g")
+                }
+                else {
+                    Text("Water: unknown")
+                }
             }
             if setting.showCarbohydrate {
-                Text("Carbohydrate: \(String(format: "%.1f", recipe.nutrition.carbohydrate)) g")
+                if recipe.nutrition.carbohydrate != -1 {
+                    Text("Carbohydrate: \(String(format: "%.1f", recipe.nutrition.carbohydrate)) g")
+                }
+                else {
+                    Text("Carbohydrate: unknown")
+                }
             }
             if setting.showSugars {
-                Text("Sugars: \(String(format: "%.1f", recipe.nutrition.sugars)) g")
+                if recipe.nutrition.sugars != -1 {
+                    Text("Sugars: \(String(format: "%.1f", recipe.nutrition.sugars)) g")
+                }
+                else {
+                    Text("Sugars: unknown")
+                }
             }
             if setting.showProtein {
-                Text("Protein: \(String(format: "%.1f", recipe.nutrition.protein)) g")
+                if recipe.nutrition.protein != -1 {
+                    Text("Protein: \(String(format: "%.1f", recipe.nutrition.protein)) g")
+                }
+                else {
+                    Text("Protein: unknown")
+                }
+                
             }
             if setting.showFat {
-                Text("Fat: \(String(format: "%.1f", recipe.nutrition.fat)) g")
+                if recipe.nutrition.fat != -1 {
+                    Text("Fat: \(String(format: "%.1f", recipe.nutrition.fat)) g")
+                }
+                else {
+                    Text("Fat: unknown")
+                }
             }
             Toggle("Favorite", isOn: $recipe.isFavorite)
         }

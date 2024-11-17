@@ -11,7 +11,7 @@ import SwiftData
 
 struct FoodListView: View {
     @Environment(\.modelContext) var modelContext
-    @State private var refreshID = UUID()
+//    @State private var refreshID = UUID()
 //    @State private var sortOrder = SortDescriptor(\Food.expirationDate)
     @Query(sort: [SortDescriptor(\Food.expirationDate), SortDescriptor(\Food.name)]) var foodList: [Food]
     @Query var userSettings: [UserSettings]
@@ -53,8 +53,9 @@ struct FoodListView: View {
 //                    .pickerStyle(.inline)
 //                }
 
-                List{
+                List {
                     ForEach(foodList) { food in
+                        
                         HStack {
                             if let imageData = food.image, let uiImage = UIImage(data: imageData) {
                                 Image(uiImage: uiImage)
@@ -73,13 +74,40 @@ struct FoodListView: View {
                             Spacer()
                             Text("Quantity: \(food.quantity) \(food.unit)")
                                 .font(.subheadline)
-                            
+//                            NavigationLink(destination: FoodDetailView(food: food)) {
                             NavigationLink(value: food) {
                             }
                         }
                     }
                     .onDelete(perform: deleteFoods)
                 }
+//                List{
+//                    ForEach(foodList) { food in
+//                        NavigationLink(destination: FoodDetailView(food: food)) {
+//                            HStack {
+//                                if let imageData = food.image, let uiImage = UIImage(data: imageData) {
+//                                    Image(uiImage: uiImage)
+//                                        .resizable()
+//                                        .frame(width: 50, height: 50)
+//                                } else {
+//                                    Image(systemName: "photo.badge.plus")
+//                                        .resizable()
+//                                        .frame(width: 50, height: 50)
+//                                }
+//                                Text(food.name)
+//                                Spacer()
+//                                Text("\(food.expirationDaysLeft) days left")
+//                                    .foregroundColor(food.expirationDaysLeft <= userSettings.first!.daysUntilNearExpiration ? .red : .primary)
+//                                Spacer()
+//                                Text("Quantity: \(food.quantity) \(food.unit)")
+//                                    .font(.subheadline)
+//                            }
+//                        }
+//                    }
+//                    .onDelete(perform: deleteFoods)
+//                }
+                
+                
 
                 NavigationLink(destination: AddFoodView()) {
                     Text("Add Food")
@@ -94,9 +122,9 @@ struct FoodListView: View {
             .navigationDestination(for: Food.self) { food in
                 FoodDetailView(food: food)
             }
-            .onAppear{
-                refreshID = UUID()
-            }
+//            .onAppear{
+//                refreshID = UUID()
+//            }
         }
         
     }
